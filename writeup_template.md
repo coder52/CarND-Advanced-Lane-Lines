@@ -103,14 +103,12 @@ Then I did some other stuff and fit my lane lines with a 2nd order polynomial ki
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-In 31st cell, I implemented radii_offset() function. 
+In 31st cell, I implemented radii_offset() function. Bu işlev ayrıca find_lane_pixels () işlevinden elde edilen koordinatları alır ve bu koordinatları her iki dizenin yarıçapını bulmak için dairenin yarıçap formülünde kullanır.To do this, he finds polynomial constants representing the lane-lines with the help of np.polyfit ().Using the polynomial function, the coordinates of the lane-lines are found for the start of x (for y = max), which can be used to calculate the position of the car on the road.The function stores the healthy values in the class () structure created in cell 29 and uses it to obtain more healthy and stable values on the video.
 
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
-
-![alt text][image6]
+I implemented this step in cell 34 and 36 in my code in the function `join_together()`.  You can see the example in the 38th cell.This function adjusts the pixels between the two lane-lines to the desired color using the coordinates of the lane-line pixels and places them on the original image with a reverse perspective transform (Minv).
 
 ---
 
@@ -118,7 +116,7 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./output_videos/project_video.mp4)
 
 ---
 
