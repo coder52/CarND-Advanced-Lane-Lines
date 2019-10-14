@@ -61,49 +61,50 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # 8 # and in `thresholds.py`).  In this function I used sobel absolute mask in x dimension and HLS color mask in S channel. You can see an example picture in the 10th cell and many examples in folder ".\output_images\undistorted-thresholded". We use this function to make the stripe lines look the best in all conditions.
+Here's an example of my output for this step.
 
 ![alt text][./output_images/undistorted-thresholded/test5.jpg]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `p_transfer()`, which appears in the 12th code cell of the IPython notebook.  The `p_transfer()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
-```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+```
+src = np.float32([[[679, 447],        # top right (x,y)
+                   [1090,700],        # bottom right (x,y)
+                   [225, 700],        # bottom left (x,y)
+                   [600, 447]]])      # top left (x,y)
+
+dst = np.float32([[[850, 0],          # top right (x,y)
+                   [850, 720],        # bottom right (x,y)
+                   [250, 720],        # bottom left (x,y)
+                   [250, 0]]])        # top left (x,y)
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 679, 447      | 850, 0        | 
+| 203, 700      | 850, 720      |
+| 225, 700     | 250, 720      |
+| 600, 460      | 250, 0        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image. You can see a good example at 14th cell and also many examples in folder '.\output_images\undistorted-transformed'.
 
 ![alt text][./output_images/undistorted-transformed-thresholded/test2.jpg]
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this: I wrote a line finder  cell at 17th cell for testing lane lines. The 'find_lane_pixels ()' function in cell 18 is used to find the pixels of the path lines.Here we first determine the x coordinates of the lane lines by summing the pixel values along the column.Then, as in line_finder (), we can see if the pixels actually belong to the lines from their height on the y-axis.We divide the screen from top to bottom into equal windows and take the x coordinates of the lines we find with the help of the histogram as the starting point.Then, if the number of white pixels in the window is more than a certain threshold value, we move upwards by accepting the average of the x coordinates of these pixels as the center of the next window. And so, we are trying to get all pixel coordinates of highway lines on the picture. In cell 19, the function named fit_polynomial () obtains the coordinates from the find_lane_pixels () function and the constants of the second-order equation of a curve using the function np.polyfit ()Road lanes show continuity along the y-axis in the pictures.Therefore, if we put all the coordinates of the y-axis in the polynomial equation, we find the x coordinates of the curves representing the lane-lines. We draw this curve on the screen with the plt.plot () function. We can also adjust the color of the pixels as desired using their coordinates. The search_around_poly () function in cell 25th likewise allows us to color a certain range of pixels along the curve drawn by the polynomial.You can see examples for that between 21-28 cells and '.\output_images\undistorted-transformed-thresholded-pipe' , '.\output_images\undistorted-transformed-thresholded-windowed' folders.
 
 ![alt text][./output_images\undistorted-transformed-thresholded-pipe/test3.jpg]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+In 31st cell, I implemented radii_offset() function. 
+
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
