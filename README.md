@@ -118,3 +118,25 @@ I implemented this step in cell 34 and 36 in my code in the function `join_toget
 
 Here's a [link to my video result](./output_videos/project_video.mp4)
 
+---
+
+### Discussion
+
+#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+
+Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+
+For example, these codes will not work on roads where lines do not appear due to bad weather conditions. In such cases, Deep Learning models can be considered to predict the location of the lane lines.
+
+The region of interest should be able to change according to the speed of the car. Speed ​​can be estimated by tracking the movements of lane lines.
+
+The codes I wrote in this project can be made a bit more organized. For example, Line related functions can be added to the `Line()` class. And other functions can be defined in a separate class by dividing it into smaller functional parts. 
+
+The windows found in the `find_lane_pixels ()` function are a bit more improvable. For example, when small windows enter an indeterminate field (as in test1 test2 and test3 pictures), the deviation can be reduced by using the information of the previous windows or with the information of the other strip. 
+
+The lane line finder function (by using Canny Edge Detection and Hough Lines ) that we used in the previous project and The line_finder () function in this project can be combined to create a healthier lane finding function.
+
+The noise in the numbers displayed on the screen can be reduced by adjusting the parameters in the function `radii_offset()` written to find the radius and by freezing a constant value when the path is flat (ie when the radius is too large).
+
+
+
