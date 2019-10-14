@@ -1,19 +1,10 @@
-## Advanced Lane Finding
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
-![Lanes Image](./examples/example_output.jpg)
+## Writeup Template
 
-In this project, your goal is to write a software pipeline to identify the lane boundaries in a video, but the main output or product we want you to create is a detailed writeup of the project.  Check out the [writeup template](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup.  
+### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
 
-Creating a great writeup:
 ---
-A great writeup should include the rubric points as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
 
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
-
-The Project
----
+**Advanced Lane Finding Project**
 
 The goals / steps of this project are the following:
 
@@ -26,14 +17,104 @@ The goals / steps of this project are the following:
 * Warp the detected lane boundaries back onto the original image.
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
-The images for camera calibration are stored in the folder called `camera_cal`.  The images in `test_images` are for testing your pipeline on single frames.  If you want to extract more test images from the videos, you can simply use an image writing method like `cv2.imwrite()`, i.e., you can read the video in frame by frame as usual, and for frames you want to save for later you can write to an image file.  
+[//]: # (Image References)
 
-To help the reviewer examine your work, please save examples of the output from each stage of your pipeline in the folder called `output_images`, and include a description in your writeup for the project of what each image shows.    The video called `project_video.mp4` is the video your pipeline should work well on.  
+[image1]: ./examples/undistort_output.png "Undistorted"
+[image2]: ./test_images/test1.jpg "Road Transformed"
+[image3]: ./examples/binary_combo_example.jpg "Binary Example"
+[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
+[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
+[image6]: ./examples/example_output.jpg "Output"
+[video1]: ./project_video.mp4 "Video"
 
-The `challenge_video.mp4` video is an extra (and optional) challenge for you if you want to test your pipeline under somewhat trickier conditions.  The `harder_challenge.mp4` video is another optional challenge and is brutal!
+## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
-If you're feeling ambitious (again, totally optional though), don't stop there!  We encourage you to go out and take video of your own, calibrate your camera and show us how you would implement this project from scratch!
+### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+---
+
+### Writeup / README
+
+#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
+
+You're reading it!
+
+### Camera Calibration
+
+#### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
+
+The code for this step is contained in the first code cell of the IPython notebook located in "./P2.ipynb".  
+
+I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
+
+I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
+
+![undistorted test1][./output_images/undistorted/test1.jpg]
+
+### Pipeline (single images)
+
+#### 1. Provide an example of a distortion-corrected image.
+
+To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one: I have written a function for making undistortion. In this function by cv2.calibrateCamera() function I took matrix (mtx) and distortion coefficients (dist) for undistortion. Then I used them in cv2.undistort() function and get undistorted image.This function is in 2nd cell in the IPython notebook.You can see many examples in 3rd, 5th, and 7th cells and also in folder "./output_images/undistorted/"
+          
+![alt text][image2]
+
+#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # 8 # and in `thresholds.py`).  In this function I used sobel absolute mask in x dimension and HLS color mask in S channel. You can see an example picture in the 10th cell and many examples in folder ".\output_images\undistorted-thresholded". We use this function to make the stripe lines look the best in all conditions.
+Here's an example of my output for this step.
+
+![./output_images/undistorted-thresholded/test5.jpg][./output_images/undistorted-thresholded/test5.jpg]
+
+#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+
+The code for my perspective transform includes a function called `p_transfer()`, which appears in the 12th code cell of the IPython notebook.  The `p_transfer()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+
+```
+src = np.float32([[[679, 447],        # top right (x,y)
+                   [1090,700],        # bottom right (x,y)
+                   [225, 700],        # bottom left (x,y)
+                   [600, 447]]])      # top left (x,y)
+
+dst = np.float32([[[850, 0],          # top right (x,y)
+                   [850, 720],        # bottom right (x,y)
+                   [250, 720],        # bottom left (x,y)
+                   [250, 0]]])        # top left (x,y)
+```
+
+This resulted in the following source and destination points:
+
+| Source        | Destination   | 
+|:-------------:|:-------------:| 
+| 679, 447      | 850, 0        | 
+| 203, 700      | 850, 720      |
+| 225, 700     | 250, 720      |
+| 600, 460      | 250, 0        |
+
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image. You can see a good example at 14th cell and also many examples in folder '.\output_images\undistorted-transformed'.
+
+![alt text][./output_images/undistorted-transformed-thresholded/test2.jpg]
+
+#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+
+Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this: I wrote a line finder  cell at 17th cell for testing lane lines. The '`find_lane_pixels ()`' function in cell 18 is used to find the pixels of the path lines.Here we first determine the x coordinates of the lane lines by summing the pixel values along the column.Then, as in `line_finder ()`, we can see if the pixels actually belong to the lines from their height on the y-axis.We divide the screen from top to bottom into equal windows and take the x coordinates of the lines we find with the help of the histogram as the starting point.Then, if the number of white pixels in the window is more than a certain threshold value, we move upwards by accepting the average of the x coordinates of these pixels as the center of the next window. And so, we are trying to get all pixel coordinates of highway lines on the picture. In cell 19, the function named `fit_polynomial ()` obtains the coordinates from the `find_lane_pixels ()` function and the constants of the second-order equation of a curve using the function `np.polyfit ()`Road lanes show continuity along the y-axis in the pictures.Therefore, if we put all the coordinates of the y-axis in the polynomial equation, we find the x coordinates of the curves representing the lane-lines. We draw this curve on the screen with the `plt.plot ()` function. We can also adjust the color of the pixels as desired using their coordinates. The `search_around_poly ()` function in cell 25th likewise allows us to color a certain range of pixels along the curve drawn by the polynomial.You can see examples for that between 21-28 cells and '.\output_images\undistorted-transformed-thresholded-pipe' , '.\output_images\undistorted-transformed-thresholded-windowed' folders.
+
+![alt text][./output_images\undistorted-transformed-thresholded-pipe/test3.jpg]
+
+#### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+
+In 31st cell, I implemented 'radii_offset()' function. Bu işlev ayrıca 'find_lane_pixels ()' işlevinden elde edilen koordinatları alır ve bu koordinatları her iki dizenin yarıçapını bulmak için dairenin yarıçap formülünde kullanır.To do this, he finds polynomial constants representing the lane-lines with the help of 'np.polyfit ()'.Using the polynomial function, the coordinates of the lane-lines are found for the start of x (for y = max), which can be used to calculate the position of the car on the road.The function stores the healthy values in the 'class ()' structure created in cell 29 and uses it to obtain more healthy and stable values on the video.
+
+
+#### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+
+I implemented this step in cell 34 and 36 in my code in the function `join_together()`.  You can see the example in the 38th cell.This function adjusts the pixels between the two lane-lines to the desired color using the coordinates of the lane-line pixels and places them on the original image with a reverse perspective transform (Minv).
+
+---
+
+### Pipeline (video)
+
+#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+
+Here's a [link to my video result](./output_videos/project_video.mp4)
 
