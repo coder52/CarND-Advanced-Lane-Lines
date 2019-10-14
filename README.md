@@ -1,7 +1,3 @@
-## Writeup Template
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
 ---
 
 **Advanced Lane Finding Project**
@@ -134,7 +130,7 @@ The codes I wrote in this project can be made a bit more organized. For example,
 
 The windows found in the `find_lane_pixels ()` function are a bit more improvable. For example, when small windows enter an indeterminate field (as in test1 test2 and test3 pictures), the deviation can be reduced by using the information of the previous windows or with the information of the other strip. 
 
-The lane line finder function (by using Canny Edge Detection and Hough Lines ) that we used in the previous project and The line_finder () function in this project can be combined to create a healthier lane finding function.
+The lane line finder function (by using Canny Edge Detection and Hough Lines ) that we used in the previous project and The `line_finder ()` function in this project can be combined to create a healthier lane finding function.
 
 The noise in the numbers displayed on the screen can be reduced by adjusting the parameters in the function `radii_offset()` written to find the radius and by freezing a constant value when the path is flat (ie when the radius is too large).
 
